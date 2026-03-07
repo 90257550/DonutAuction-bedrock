@@ -1,0 +1,32 @@
+name: DonutAuctionHouse
+version: ${project.version}
+main: io.nightbeam.donutauction.AuctionHousePlugin
+api-version: '1.20'
+folia-supported: true
+authors:
+  - GitHub Copilot
+description: Standalone auction house plugin with Vault economy and optional DonutCore integration.
+depend:
+  - Vault
+softdepend:
+  - DonutCore
+commands:
+  ah:
+    description: Opens the auction house.
+    usage: /ah [sell <price>|cancel]
+    aliases: [auctionhouse]
+    permission: donutcore.auction.use
+  auction:
+    description: Opens the auction house.
+    usage: /auction
+    permission: donutcore.auction.use
+permissions:
+  donutcore.auction.use:
+    description: Access to the auction house.
+    default: true
+  donutcore.auction.sell:
+    description: Allows selling items through the auction house.
+    default: true
+  donutcore.auction.admin:
+    description: Administrative auction controls.
+    default: op

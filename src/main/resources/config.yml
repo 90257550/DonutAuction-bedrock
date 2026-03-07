@@ -1,0 +1,20 @@
+storage:
+  type: SQLITE
+  sqlite:
+    file: auctions.db
+  mysql:
+    host: localhost
+    port: 3306
+    database: donut_auction_house
+    username: root
+    password: password
+    parameters: useSSL=false&characterEncoding=utf8
+
+auction:
+  listing-duration-hours: 48
+  browse-page-size: 45
+  expired-scan-interval-seconds: 60
+  max-price: 1.0E9
+
+messages:
+  prefix: '&6&lAuctionHouse &8» '
