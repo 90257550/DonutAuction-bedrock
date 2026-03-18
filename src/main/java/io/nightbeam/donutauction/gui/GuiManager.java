@@ -74,6 +74,14 @@ public final class GuiManager {
         openAuctionHouse(player, session);
     }
 
+    public void resetSearchFilter(Player player) {
+        PlayerAuctionSession session = sessions.get(player.getUniqueId());
+        if (session == null || session.request().searchTerm().isBlank()) {
+            return;
+        }
+        session.request(session.request().withSearch(""));
+    }
+
     public void clear(Player player) {
         awaitingSearch.remove(player.getUniqueId());
         sessions.remove(player.getUniqueId());
