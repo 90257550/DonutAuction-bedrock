@@ -45,6 +45,9 @@ public final class AuctionInventoryListener implements Listener {
             if (guiManager.isAwaitingSearch(player.getUniqueId())) {
                 return;
             }
+            if (guiManager.isNavigating(player.getUniqueId())) {
+                return;
+            }
             if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof BaseGui) {
                 return;
             }

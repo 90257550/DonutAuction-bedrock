@@ -21,6 +21,7 @@ public final class GuiManager {
     private final Map<UUID, PlayerAuctionSession> sessions = new ConcurrentHashMap<>();
     private final Map<UUID, Integer> playerItemsPages = new ConcurrentHashMap<>();
     private final Set<UUID> awaitingSearch = ConcurrentHashMap.newKeySet();
+    private final Set<UUID> navigating = ConcurrentHashMap.newKeySet();
 
     public GuiManager(AuctionHousePlugin plugin, AuctionService auctionService, AuctionManager auctionManager, DonutCoreHook donutCoreHook) {
         this.plugin = plugin;
@@ -82,8 +83,13 @@ public final class GuiManager {
         session.request(session.request().withSearch(""));
     }
 
+    public boolean isNavigating(UUID playerId) {
+        return navigating.remove(playerId);
+    }
+
     public void clear(Player player) {
         awaitingSearch.remove(player.getUniqueId());
+        navigating.remove(player.getUniqueId());
         sessions.remove(player.getUniqueId());
         playerItemsPages.remove(player.getUniqueId());
     }
@@ -109,6 +115,7 @@ public final class GuiManager {
     }
 
     private void open(Player player, BaseGui gui) {
+        navigating.add(player.getUniqueId());
         player.openInventory(gui.render(player));
     }
 }
