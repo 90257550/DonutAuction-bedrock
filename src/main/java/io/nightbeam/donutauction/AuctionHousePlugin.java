@@ -32,6 +32,7 @@ public final class AuctionHousePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        applyConfigDefaults();
 
         this.schedulerAdapter = new SchedulerAdapter(this);
         this.economyProvider = VaultEconomyProvider.create(this)
@@ -90,5 +91,12 @@ public final class AuctionHousePlugin extends JavaPlugin {
 
     public MessageUtil messages() {
         return new MessageUtil(getConfig().getString("messages.prefix", "&6[DonutAuctionHouse]&r "));
+    }
+
+    public void applyConfigDefaults() {
+        getConfig().addDefault("auction.min-price", 10.0D);
+        getConfig().addDefault("messages.price-below-min", "&cMinimum auction price is &6%min_price%&c.");
+        getConfig().options().copyDefaults(true);
+        saveConfig();
     }
 }

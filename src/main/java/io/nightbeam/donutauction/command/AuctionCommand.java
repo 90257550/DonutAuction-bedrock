@@ -67,6 +67,18 @@ public final class AuctionCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("reload")) {
+            if (!player.hasPermission("donutcore.auction.admin")) {
+                plugin.messages().send(player, "&cYou do not have permission to reload this plugin.");
+                return true;
+            }
+
+            plugin.reloadConfig();
+            plugin.applyConfigDefaults();
+            plugin.messages().send(player, "&aDonutAuctionHouse configuration reloaded.");
+            return true;
+        }
+
         if (args[0].equalsIgnoreCase("cancel")) {
             guiManager.openPlayerItems(player);
             return true;
@@ -79,7 +91,7 @@ public final class AuctionCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return List.of("sell", "cancel").stream().filter(value -> value.startsWith(args[0].toLowerCase())).toList();
+            return List.of("sell", "cancel", "reload").stream().filter(value -> value.startsWith(args[0].toLowerCase())).toList();
         }
         return List.of();
     }

@@ -7,6 +7,7 @@ import io.nightbeam.donutauction.model.AuctionBrowseRequest;
 import io.nightbeam.donutauction.model.AuctionListing;
 import io.nightbeam.donutauction.model.AuctionPage;
 import io.nightbeam.donutauction.model.AuctionStatus;
+import io.nightbeam.donutauction.model.ListingPriceValidationResult;
 import io.nightbeam.donutauction.storage.AuctionRepository;
 import io.nightbeam.donutauction.util.SchedulerAdapter;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
@@ -88,8 +89,15 @@ public final class AuctionService {
             return CompletableFuture.completedFuture(ActionResult.failure("&cHold the item you want to list."));
         }
 
+        double minPrice = plugin.getConfig().getDouble("auction.min-price", 10.0D);
         double maxPrice = plugin.getConfig().getDouble("auction.max-price", 1.0E9);
-        if (price <= 0 || price > maxPrice) {
+        ListingPriceValidationResult validationResult = ListingPriceValidationResult.validate(price, minPrice, maxPrice);
+        if (validationResult == ListingPriceValidationResult.BELOW_MINIMUM) {
+            String message = plugin.getConfig().getString("messages.price-below-min", "&cMinimum auction price is &6%min_price%&c.");
+            message = message.replace("%min_price%", economyProvider.format(Math.max(0.0D, minPrice)));
+            return CompletableFuture.completedFuture(ActionResult.failure(message));
+        }
+        if (validationResult == ListingPriceValidationResult.INVALID_OR_ABOVE_MAX) {
             return CompletableFuture.completedFuture(ActionResult.failure("&cPrice must be greater than 0 and below the configured limit."));
         }
 

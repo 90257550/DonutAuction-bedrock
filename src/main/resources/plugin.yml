@@ -13,7 +13,7 @@ softdepend:
 commands:
   ah:
     description: Opens the auction house.
-    usage: /ah [sell <price>|cancel]
+    usage: /ah [sell <price>|cancel|reload]
     aliases: [auctionhouse]
     permission: donutcore.auction.use
   auction:
