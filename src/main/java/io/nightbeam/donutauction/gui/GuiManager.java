@@ -1,6 +1,7 @@
 package io.nightbeam.donutauction.gui;
 
 import io.nightbeam.donutauction.AuctionHousePlugin;
+import io.nightbeam.donutauction.floodgate.FloodgateFormHandler;
 import io.nightbeam.donutauction.hook.DonutCoreHook;
 import io.nightbeam.donutauction.model.PlayerAuctionSession;
 import io.nightbeam.donutauction.service.AuctionManager;
@@ -22,6 +23,7 @@ public final class GuiManager {
     private final Map<UUID, Integer> playerItemsPages = new ConcurrentHashMap<>();
     private final Set<UUID> awaitingSearch = ConcurrentHashMap.newKeySet();
     private final Set<UUID> navigating = ConcurrentHashMap.newKeySet();
+    private FloodgateFormHandler floodgateFormHandler;
 
     public GuiManager(AuctionHousePlugin plugin, AuctionService auctionService, AuctionManager auctionManager, DonutCoreHook donutCoreHook) {
         this.plugin = plugin;
@@ -30,7 +32,25 @@ public final class GuiManager {
         this.donutCoreHook = donutCoreHook;
     }
 
+    public void setFloodgateFormHandler(FloodgateFormHandler handler) {
+        this.floodgateFormHandler = handler;
+    }
+
+    public boolean isFloodgatePlayer(Player player) {
+        return floodgateFormHandler != null && floodgateFormHandler.isFloodgatePlayer(player);
+    }
+
+    public void openSellForm(Player player) {
+        if (floodgateFormHandler != null) {
+            floodgateFormHandler.openSellForm(player);
+        }
+    }
+
     public void openAuctionHouse(Player player) {
+        if (floodgateFormHandler != null && floodgateFormHandler.isFloodgatePlayer(player)) {
+            floodgateFormHandler.openBrowseForm(player, session(player));
+            return;
+        }
         open(player, new AuctionGui(this, auctionService, donutCoreHook, session(player)));
     }
 
@@ -43,6 +63,10 @@ public final class GuiManager {
     }
 
     public void openPlayerItems(Player player) {
+        if (floodgateFormHandler != null && floodgateFormHandler.isFloodgatePlayer(player)) {
+            floodgateFormHandler.openPlayerItemsForm(player);
+            return;
+        }
         open(player, new PlayerAuctionGui(this, auctionService, playerItemsPage(player.getUniqueId())));
     }
 

@@ -2,6 +2,10 @@ package io.nightbeam.donutauction;
 
 import io.nightbeam.donutauction.command.AuctionCommand;
 import io.nightbeam.donutauction.economy.VaultEconomyProvider;
+import io.nightbeam.donutauction.floodgate.ActiveFloodgateHook;
+import io.nightbeam.donutauction.floodgate.FloodgateFormHandler;
+import io.nightbeam.donutauction.floodgate.FloodgateHook;
+import io.nightbeam.donutauction.floodgate.NoopFloodgateHook;
 import io.nightbeam.donutauction.gui.GuiManager;
 import io.nightbeam.donutauction.hook.DonutCoreHook;
 import io.nightbeam.donutauction.hook.HookManager;
@@ -28,6 +32,8 @@ public final class AuctionHousePlugin extends JavaPlugin {
     private AuctionService auctionService;
     private GuiManager guiManager;
     private DonutCoreHook donutCoreHook;
+    private FloodgateHook floodgateHook;
+    private FloodgateFormHandler floodgateFormHandler;
 
     @Override
     public void onEnable() {
@@ -45,6 +51,12 @@ public final class AuctionHousePlugin extends JavaPlugin {
         this.donutCoreHook = HookManager.create(this);
         this.auctionService = new AuctionService(this, schedulerAdapter, economyProvider, auctionRepository, auctionManager, donutCoreHook);
         this.guiManager = new GuiManager(this, auctionService, auctionManager, donutCoreHook);
+
+        this.floodgateHook = createFloodgateHook();
+        if (floodgateHook.isAvailable()) {
+            this.floodgateFormHandler = new FloodgateFormHandler(this, floodgateHook, guiManager, auctionService, donutCoreHook);
+            guiManager.setFloodgateFormHandler(floodgateFormHandler);
+        }
 
         this.auctionService.initialize();
         registerCommands();
@@ -98,5 +110,17 @@ public final class AuctionHousePlugin extends JavaPlugin {
         getConfig().addDefault("messages.price-below-min", "&cMinimum auction price is &6%min_price%&c.");
         getConfig().options().copyDefaults(true);
         saveConfig();
+    }
+
+    private FloodgateHook createFloodgateHook() {
+        try {
+            if (getServer().getPluginManager().getPlugin("Floodgate") != null) {
+                getLogger().info("Floodgate detected, enabling Bedrock form UI.");
+                return new ActiveFloodgateHook();
+            }
+        } catch (Exception e) {
+            getLogger().warning("Failed to initialize Floodgate hook: " + e.getMessage());
+        }
+        return new NoopFloodgateHook();
     }
 }

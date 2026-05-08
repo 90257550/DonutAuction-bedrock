@@ -46,6 +46,10 @@ public final class AuctionCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args.length < 2) {
+                if (guiManager.isFloodgatePlayer(player)) {
+                    guiManager.openSellForm(player);
+                    return true;
+                }
                 plugin.messages().send(player, "&cUsage: /ah sell <price>");
                 return true;
             }

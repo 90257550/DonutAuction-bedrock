@@ -10,6 +10,7 @@ depend:
   - Vault
 softdepend:
   - DonutCore
+  - Floodgate
 commands:
   ah:
     description: Opens the auction house.
